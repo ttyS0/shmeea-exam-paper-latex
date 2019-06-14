@@ -1,0 +1,445 @@
+% !TEX program = xelatex
+\documentclass[10pt,answers,addpoints]{exam}
+%\usepackage{exam}
+\usepackage[fontset=shmeea]{ctex}
+\usepackage{multicol}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage{tasks}
+\usepackage{gensymb}
+\usepackage{xifthen}
+\usepackage{newtxtext}
+\usepackage[uprightGreek]{newtxmath}
+\DeclareMathSizes{10}{12}{6.96}{5.04} 
+\DeclareMathOperator{\iu}{i}
+\usepackage[b5paper, top=2cm, bottom=3.5cm, inner=1.9cm, outer=1.8cm]{geometry}
+%\usepackage[paperwidth=18.4cm, paperheight=26cm, top=2cm, bottom=3.5cm, hmargin=2cm]{geometry}
+\usepackage[inline, shortlabels]{enumitem}
+%\usepackage[subscriptcorrection,slantedGreek,nofontinfo]{mtpro2}
+\setlength\fillinlinelength{1.5cm}
+\newcommand{\abs}[1]{
+    \ensuremath{\left\lvert#1\right\rvert}
+}
+\newcounter{numpofq}
+
+\newcommand{\setcountertopartsofq}[1]{%
+  \def\qnotemp{#1}%
+  \setcounter{numpofq}{1}%
+  \numpofqrelay
+}%
+
+\def\numpofqrelay{%
+  \expandafter\ifx\csname Pg@part@\qnotemp
+                  @\arabic{numpofq}\endcsname\relax
+    % This part number doesn't exist; back up one and exit:
+    \addtocounter{numpofq}{-1}%
+    \let\nextnumpofqrelay=\relax
+  \else
+    % This part number exists; try the next number:
+    \addtocounter{numpofq}{1}%
+    \let\nextnumpofqrelay=\numpofqrelay
+  \fi
+  \nextnumpofqrelay
+}% numpofqrelay
+
+\makeatletter
+\long\def\questionvbox#1{%
+  \par\smallskip
+  \vbox{%
+    \parindent=\leftmargin
+    \leftskip=\@totalleftmargin
+    \advance\leftskip-\leftmargin
+    \advance\@totalleftmargin-\leftmargin
+    \advance\linewidth\leftmargin
+    #1%
+  }%
+  \nobreak
+}
+\def\wordnum#1{\expandafter\word\csname c@#1\endcsname}
+\def\word#1{%
+  \ifcase #1 zero\or one\or two\or three\or four\or five\or six\or
+  seven\or eight\or nine\or ten\or eleven\or twelve\or thirteen\or
+  fourteen\or fifteen\or sixteen\or seventeen\or eighteen\or
+  nineteen\or twenty\else too many\fi
+}% word
+\makeatother
+%\DeclareMathSizes{10.95}{10}{7}{7}
+\makeatletter
+%\DeclareMathSizes{11}{19}{13}{9}
+\newcommand\ExamYear[1]{\renewcommand\@ExamYear{#1}}
+\newcommand\@ExamYear{\the\year{}}
+\newcommand\ExamSubject[1]{\renewcommand\@ExamSubject{#1}}
+\newcommand\@ExamSubject{}
+\newcommand{\ShmeeaTitle}{
+    \begin{center}
+        {\Large{\@ExamYear}年普通高等学校招生全国统一考试\par}
+        \vspace*{1\baselineskip}
+        {\huge\bfseries{上海\quad{\@ExamSubject}试卷}}
+        \vspace*{1\baselineskip}
+    \end{center}
+}
+\newcommand{\ShmeeaNotice}[2]{
+    {
+        \heiti 考生注意
+        \begin{enumerate}[leftmargin=34pt, nosep, topsep=0pt]
+            \item 本场考试时间 #1 分钟, 试卷共 \numpages 页, 满分 \numpoints 分, 答题纸共 #2 页.
+            \item 作答前, 在答题纸正面填写姓名、准考证号，反面填写姓名，将核对后的条形码贴在答题纸指定位置.
+            \item 所有作答务必填涂或书写在答题纸上与试卷题号对应的区域，不得错位，在试卷上作答一律不得分.
+            \item 用 2B 铅笔作答选择题，用黑色字迹钢笔、水笔或圆珠笔作答非选择题.
+        \end{enumerate}
+    }
+}
+\firstpagefooter{{\windowsong 上海市教育考试院}{\quad}{\bfseries 保留版权}}{}{\windowsong {\@ExamYear}年高考{\@ExamSubject} 第 \thepage 页（共 \numpages 页）}
+\runningfooter{\oddeven{}{\windowsong {\@ExamYear}年高考{\@ExamSubject} 第 \thepage 页（共 \numpages 页）}}{}{\oddeven{\windowsong {\@ExamYear}年高考{\@ExamSubject} 第 \thepage 页（共 \numpages 页）}{}}
+\makeatother
+\author{T}
+\newcounter{bigpartcounter}
+\newcommand{\bigpart}[4]{
+    \stepcounter{bigpartcounter}
+    \uplevel{\bfseries{\chinese{bigpartcounter}、#2\enspace{（本大题共有 \numqinrange{#1} 题，满分 {\pointsinrange{#1}} 分 {#3}）}\enspace{{#4}}}}
+}
+\newcommand{\detail}[1]{
+    %\ifnum#1=1
+    %\ifthenelse{{\the\numqinrange{#1}}=1}
+    %{第 \firstqinrange{#1} 题 \pointsofquestion{\the\firstqinrange{#1}} 分}
+    {第 \firstqinrange{#1}\~\lastqinrange{#1} 题 \firstqinrange{#1} 分}
+    %\else
+    %第 \firstqinrange{#1}\~\lastqinrange{#1} 题每题 \pointsofquestion{\firstqinrange{#1}} 分
+    %\fi
+}
+\newcommand{\solvingtitle}[1]{%，共 \arabic{numpofq} 部分
+    \setcountertopartsofq{\arabic{question}}{\bfseries （本题满分 \pointsofquestion{\thequestion} 分{#1}）\par}
+}
+\newcommand{\bracketfillin}[1][]{
+    %\ifthenelse{\isempty{#1}}{
+    %}{
+    %}
+    \ifprintanswers
+        \nolinebreak\dotfill\mbox{(\fillin[#1][0.6cm])}
+    \else
+        \nolinebreak\dotfill\mbox{(\hspace{0.6cm})}
+    \fi
+}
+%\newcommand{\bracketfillin}[1][1]{\nolinebreak\dotfill\mbox{(\hspace{0.8cm})} }
+%\newcommand{\bracketfillin}[1][1]{\nolinebreak\dotfill\mbox{\raisebox{-1.8pt}(\hspace{1cm})} }
+\newlength\labelwd
+\settowidth\labelwd{(A)}
+\settasks{counter-format=(tsk[A]), label-width=\labelwd, after-item-skip=0pt}
+\newcommand{\fourch}[4]{
+\begin{tasks}(4)
+    \task #1
+    \task #2
+    \task #3
+    \task #4
+\end{tasks}
+}
+
+\newcommand{\twoch}[4]{
+\begin{tasks}(2)
+    \task #1
+    \task #2
+    \task #3
+    \task #4
+\end{tasks}
+}
+
+\newcommand{\onech}[4]{
+\begin{tasks}(1)
+    \task #1
+    \task #2
+    \task #3
+    \task #4
+\end{tasks}
+}
+
+\newlength\widthcha
+\newlength\widthchb
+\newlength\widthchc
+\newlength\widthchd
+\newlength\widthch
+\newlength\tabmaxwidth
+
+\setlength\tabmaxwidth{0.96\textwidth}
+\newlength\fourthtabwidth
+\setlength\fourthtabwidth{0.25\textwidth}
+\newlength\halftabwidth
+\setlength\halftabwidth{0.5\textwidth}
+
+\newcommand{\choice}[4]{%
+\settowidth\widthcha{ (A) .#1}\setlength{\widthch}{\widthcha}%
+\settowidth\widthchb{ (B) .#2}%
+\ifdim\widthch<\widthchb\relax\setlength{\widthch}{\widthchb}\fi%
+\settowidth\widthchc{ (C) .#3}%
+\ifdim\widthch<\widthchc\relax\setlength{\widthch}{\widthchc}\fi%
+\settowidth\widthchd{ (D) .#4}%
+\ifdim\widthch<\widthchd\relax\setlength{\widthch}{\widthchd}\fi%
+\ifdim\widthch<\fourthtabwidth
+\fourch{#1}{#2}{#3}{#4}
+\else\ifdim\widthch<\halftabwidth
+    \twoch{#1}{#2}{#3}{#4}
+\else
+    \onech{#1}{#2}{#3}{#4}
+\fi
+\fi
+}
+\ExamYear{2018}
+\ExamSubject{数学}
+\everymath{\displaystyle}
+%\pointsinmargin
+\pointname{分}
+\renewcommand{\solutiontitle}{\textbf{解}\enspace}
+\renewcommand{\thepartno}{\arabic{partno}}
+\renewcommand{\partshook}{\setlength{\parindent}{\leftmargin}\setlength{\topsep}{0pt}\setlength{\itemsep}{0pt}}
+\addpoints
+%\bracketedpoints
+\boxedpoints
+\pointsinleftmargin
+%\pointsdroppedatright
+\begin{document}
+    \ShmeeaTitle
+    \ShmeeaNotice{120}{2}
+
+    \begin{questions}
+        \bigpart{blanks}{填空题}{，第 \firstqinrange{blanks4}\textasciitilde{}\lastqinrange{blanks4} 题每题 4 分，第 \firstqinrange{blanks5}\textasciitilde{}\lastqinrange{blanks5} 题每题 5 分}
+        {
+            考生应在答题纸的相应位置直接填写结果.
+        }
+        \begingradingrange{blanks}
+            \begingradingrange{blanks4}
+            \question[4]
+                行列式 $\begin{vmatrix}4&1\\2&5\end{vmatrix}$ 的值为 \fillin[$18$].
+            \question[4]
+                双曲线 $\frac{x^2}{4}-y^2=1$ 的渐近线方程为 \fillin[$y=\pm\frac12x$].
+            \question[4]
+                在 $(1+x)^7$ 的二项展开式中，$x^2$ 项的系数为 \fillin[$21$] （结果用数值表示）.
+            \question[4]
+                设常数 $a\in\mathbf{R}$，函数 $f(x)=\log_2(x+a)$，若 $f(x)$ 的反函数的图像经过点 $(3,1)$，则 $a=$ \fillin[$7$].
+            \question[4]
+                已知复数 $z$ 满足 $(1+\iu)z=1-7\iu$（$\iu$ 是虚数单位），则 $\abs{z}=$ \fillin[$5$].
+            \question[4]
+                记等差数列$\left\{a_n\right\}$的前 $n$ 项和为 $S_n$. 若 $a_3=0$，$a_6+a_7=14$，则 $S_7=$ \fillin[$14$].
+            \endgradingrange{blanks4}
+            \begingradingrange{blanks5}
+            \question[5]
+                已知 $\alpha\in\,\left\{\,-2,-1,-\frac12,\frac12,1,2,3\,\right\}\,$. 若幂函数 $f(x) = {x^\alpha}$ 为奇函数，且在 $(0,+\infty)$ 上递减，则 $\alpha=$ \fillin[$-1$].
+            \question[5]
+                在平面直角坐标系中，已知点 $A(-1,0)\,$、$\,B(2,0)$，$E\,$、$\,F$ 是 $y$ 轴上的两个动点，且 $\abs{\overrightarrow{EF}}=2$，则$\overrightarrow{AE}\cdot\overrightarrow{BF}$的最小值为 \fillin[$-3$].
+            \question[5]
+                有编号互不相同的五个砝码，其中 $5$ 克、$3$ 克、$1$ 克砝码各一个，$2$ 克砝码两个. 从中随机选取三个，则这三个砝码的总质量为 $9$ 克的概率是 \fillin[$\frac15$] (结果用最简分数表示).
+            \question[5]
+                设等比数列 $\{a_n\}$ 的通项公式为 $a_n=q^{n+1}\enspace(n\in\mathbf{N}^*)$，前 $n$ 项和为 $S_n$. 若$\lim_{n\to\infty}\frac{S_n}{a_{n+1}}=\frac12$，则 $q=$ \fillin[$3$].
+            \question[5]
+                已知常数 $a>0$，函数 $f(x)=\frac{2^x}{2^x+ax}$ 的图像经过点 $P\,\left(p,\frac65\right)\,$、$Q\,\left(q,-\frac15\right)\,$，若 $2^{p + q} = 36pq$，则 $a=$ \fillin[$6$].
+            \question[5]
+                已知实数 $x_1$、$x_2$、$y_1$、$y_2$ 满足: $x_1^2+y_1^2=1$，$x_2^2+y_2^2=1$，$x_1x_2+y_1y_2=\frac12$，则 $\frac{\abs{x_1+y_1-1}}{\sqrt2}+\frac{\abs{x_2+y_2-1}}{\sqrt2}$ 的最大值为 \fillin[$\sqrt2+\sqrt3$].
+            \endgradingrange{blanks5}
+        \endgradingrange{blanks}
+        \bigpart{choices}{选择题}{，每题 5 分}
+        {
+            每题有且只有一个正确选项，考生应在答题纸的相应位置，将代表正确选项的小方格涂黑.
+        }
+        \begingradingrange{choices}
+            \question[5] 设 $P$ 是椭圆 $\frac{x^2}{5}+\frac{y^2}{3}=1$ 上的动点，则 $P$ 到该椭圆的两个焦点的距离之和为 \bracketfillin[C].
+            \choice{$2\sqrt2$}{$2\sqrt3$}{$2\sqrt5$}{$4\sqrt2$}
+            \question[5] 已知 $a\in\mathbf{R}$，则“$a>1$”是“$\frac1a<1$” 的 \bracketfillin[A].
+            \choice{充分非必要条件}{必要非充分条件}{充要条件}{既非充分又非必要条件}
+            \question[5]
+            \noindent
+            \begin{minipage}[t]{0.65\textwidth}
+                \fussy
+                《九章算术》中，称底面为矩形而有一侧棱垂直于底面的四棱锥为阳马. 设 $AA_1$ 是正六棱柱的一条侧棱，如图. 
+                若阳马以该正六棱柱的顶点为顶点，以 $AA_1$ 为底面矩形的一边，则这样的阳马的个数是 \bracketfillin[D].
+                \choice{$4$}{$8$}{$12$}{$16$}
+            \end{minipage}\hfill
+            \begin{minipage}[t]{0.3\textwidth}
+                \centering\raisebox{\dimexpr \topskip-\height}{%
+                \begin{tikzpicture}[smooth, thick, scale=0.55]
+                    \coordinate (A) at (0,0);
+                    \coordinate (B) at (1.73,1);
+                    \coordinate (C) at (1,1.73);
+                    \coordinate (D) at (-2.46,1.73);
+                    \coordinate (E) at (-4.19,0.73);
+                    \coordinate (F) at (-3.46,0);
+                    \coordinate (A1) at (0,6);
+                    \coordinate (B1) at (1.73,7);
+                    \coordinate (C1) at (1,7.73);
+                    \coordinate (D1) at (-2.46,7.73);
+                    \coordinate (E1) at (-4.19,6.73);
+                    \coordinate (F1) at (-3.46,6);
+                    \draw (A) node[below] {$A$};
+                    \draw (A1) node[above] {$A_1$};
+                    \begin{scope}[densely dashed]
+                        \draw (B) -- (C) -- (D) -- (E);
+                        %\draw (E1) -- (F1) -- (A1) -- (B1) -- (C1) -- (D1) -- cycle;
+                        \draw (C) -- (C1);
+                        \draw (D) -- (D1);
+                    \end{scope}
+                    \draw (E) -- (F) -- (A) -- (B);
+                    \draw (E1) -- (F1) -- (A1) -- (B1) -- (C1) -- (D1) -- cycle;
+                    \draw (E) -- (E1);
+                    \draw (F) -- (F1);
+                    \draw (A) -- (A1);
+                    \draw (B) -- (B1);
+                \end{tikzpicture}
+                }
+            \end{minipage}
+            \question[5] 设 $D$ 是含数 $1$ 的有限实数集，$f(x)$ 是定义在 $D$ 上的函数. 若 $f(x)$ 的图像绕原点逆时针旋转 $\frac\pi6$ 后与原图像重合，则在以下各项中，$f(1)$ 的可能取值只能是 \bracketfillin[B].
+            \choice{$\sqrt3$}{$\frac{\sqrt3}{2}$}{$\frac{\sqrt3}{3}$}{$0$}
+        \endgradingrange{choices}
+        \bigpart{solving}{解答题}{}
+        {
+            解答下列各题必须在答题纸的相应位置写出必要的步骤.
+        }
+        \begingradingrange{solving}
+            \question \solvingtitle{}%\detail{\thequestion}
+            \noindent
+            \begin{minipage}[t]{0.65\textwidth}
+                \fussy
+                \questionvbox{
+                已知圆锥的顶点为 $P$，底面圆心为 $O$，半径为 $2$.
+                }
+                    \begin{parts}
+                        \part[6] 设圆锥的母线长为 $4$, 求圆锥的体积；
+                        \part[8] 设 $PO=4$，$OA$、$OB$ 是底面半径，且 $\angle{AOB}=90\degree$，$M$ 为线段 $AB$ 的中点，如图. 求异面直线 $PM$ 与 $OB$ 所成的角的大小.
+                    \end{parts}
+            \end{minipage}\hfill
+            \begin{minipage}[t]{0.3\textwidth}
+                \centering\raisebox{\dimexpr \topskip-\height}{%
+                \begin{tikzpicture}[smooth, thick, scale=0.45]
+
+                    \newcommand{\radiusx}{3}
+                    \newcommand{\radiusy}{1.2}
+                    \newcommand{\height}{6}
+
+                    \coordinate (O) at (0,0);
+                    \coordinate (P) at (0,\height);
+                    \coordinate (lp) at (-{\radiusx*sqrt(1-(\radiusy/\height)*(\radiusy/\height))},{\radiusy*(\radiusy/\height)});
+                    \coordinate (rp) at ({\radiusx*sqrt(1-(\radiusy/\height)*(\radiusy/\height))},{\radiusy*(\radiusy/\height)});
+                    \coordinate (A) at (-1,-1.13);
+                    \coordinate (B) at (\radiusx,0);
+                    \coordinate (M) at ($.5*(A)+.5*(B)$);
+                    %\draw[fill=gray!30] (a)--(0,\height)--(b)--cycle;
+                    \draw (lp)--(0,\height)--(rp);%--cycle;
+
+                    %\fill[gray!50] circle (\radiusx{} and \radiusy);
+                    %\draw circle (\radiusx{} and \radiusy);
+
+                    \begin{scope}
+                    \clip ([xshift=-2mm]lp) rectangle ($(rp)+(1mm,-2*\radiusy)$);
+                    \draw circle (\radiusx{} and \radiusy);
+                    \end{scope}
+                    
+                    \begin{scope}
+                    \clip ([xshift=-2mm]lp) rectangle ($(rp)+(1mm,2*\radiusy)$);
+                    \draw[densely dashed] circle (\radiusx{} and \radiusy);
+                    \end{scope}
+                    
+                    %\draw[dashed] (0,\height)|-(\radiusx,0) node[right, pos=.25]{$h$} node[above,pos=.75]{$r$};
+                    \draw[dashed] (0,\height)|-(\radiusx,0);
+                    
+                    \draw (P) node[left] {\small $P$};
+                    \draw (O) node[left] {\small $O$};
+                    \draw (A) node[below] {\small $A$};
+                    \draw (B) node[right] {\small $B$};
+                    \draw (M) node[right=2pt,below=-3pt] {\small $M$};
+                    \begin{scope}[densely dashed]
+                        \draw (B) -- (A);
+                        \draw (P) -- (A);
+                        \draw (P) -- (M);
+                    \end{scope}
+                    %\draw (0,.15)-|(.15,0);
+                \end{tikzpicture}
+                }
+            \end{minipage}
+                \begin{solutionordottedlines}[2cm]
+                    \begin{small}
+                        \begin{enumerate*}[(1),nosep,topsep=0pt]
+                            \item $V=\frac83\sqrt3\pi$；
+                            \item 异面直线 $PM$ 与 $OB$ 所成的角的大小为 $\arccos\frac{\sqrt2}{6}$.
+                        \end{enumerate*}
+                    \end{small}
+                \end{solutionordottedlines}
+            \question \solvingtitle{}%\detail{\thequestion}
+            \questionvbox{
+                设常数 $a\in\mathbf{R}$，函数 $f(x)=a\sin 2x+2\cos^2 x$
+            }
+                \begin{parts}
+                        \part[6] 若 $f(x)$ 为偶函数，求 $a$ 的值；
+                        \part[8] 若 $f\left(\frac\pi4\right)=\sqrt3+1$，求方程 $f(x)=1-\sqrt2$ 在区间 $[-\pi,\pi]$ 上的解.
+                \end{parts}
+                \begin{solutionordottedlines}[2cm]
+                    \begin{small}
+                        \begin{enumerate*}[(1),nosep,topsep=0pt]
+                            \item $a=0$；
+                            \item 零点为 $x=-\frac{13}{24}\pi,-\frac{11}{24}\pi,-\frac{5}{24}\pi,\frac{19}{24}\pi$.
+                        \end{enumerate*}
+                    \end{small}
+                \end{solutionordottedlines}
+            \question \solvingtitle{}
+            \questionvbox{%
+            某群体的人均通勤时间，是指单日内该群体中成员从居住地到工作地的平均用时，某地上班族 $S$ 中的成员仅以自驾或公交方式通勤. 分析显示：当 $S$ 中 $x\%\enspace(0<x<100)$ 的成员自驾时，自驾群体的人均通勤时间为
+                $$
+                    f(x)=
+                    \begin{cases}
+                    30,&0<x\leq 30,\\
+                    2x+\frac{1800}x-90,&30<x<100    
+                    \end{cases}
+                    \text{（单位：分钟），}
+                $$
+                而公交群体的人均通勤时间不受 $x$ 影响，恒为 $40$ 分钟. 试根据上述分析结果回答下列问题：
+            }
+                \begin{parts}
+                    \part[6] 当 $x$ 在什么范围内时，公交群体的人均通勤时间少于自驾群体的人均通勤时间？
+                    \part[8] 求该地上班族 $S$ 的人均通勤时间 $g(x)$ 的表达式；讨论 $g(x)$ 的单调性，并说明其实际意义.
+                \end{parts}
+                \begin{solutionordottedlines}[2cm]
+                    \begin{small}
+                        \begin{enumerate*}[(1),nosep,topsep=0pt]
+                            \item $x\in(45,100)$时，公交群体的人均通勤时间少于自驾群体的人均通勤时间；\\
+                            \item $g(x)=\begin{cases}40-\frac{x}{10},&0<x\leq 30,\\\frac1{50}(x-32.5)^2+36.875,&30<x<100.\end{cases}$
+                            \\
+                            $x\in(0,32.5]$ 时，$g(x)$ 单调递减；$x\in(32.5,100)$ 时，$g(x)$ 单调递增.
+                            \\
+                            实际意义是当有 $32.5\%$ 的上班族采用自驾方式时，上班族整体的人均通勤时间最短. 适当的增加自驾比例，可以充分地利用道路交通，实现整体效率提升；但自驾人数过多，则容易导致交通拥堵，使得整体效率下降.
+                        \end{enumerate*}
+                    \end{small}
+                \end{solutionordottedlines}
+            \question \solvingtitle{}
+            \questionvbox{
+                设常数 $t>2$，在平面直角坐标系 $xOy$ 中，已知点 $F(2,0)$，直线 $l:x=t$，曲线 $\Gamma:y^2=8x\enspace(0\leq x\leq t,y\geq 0)$. $l$ 与 $x$ 轴交于点 $A$、与 $\Gamma$ 交于点 $B$. $P$、$Q$ 分别是曲线 $\Gamma$ 与线段 $AB$ 上的动点.
+            }
+            \begin{parts}
+                \part[4] 用 $t$ 为表示点 $B$ 到点 $F$ 的距离；
+                \part[6] 设 $t\!=\!3$，$\abs{FQ}=2$ ，线段 $OQ$ 的中点在直线 $FP$ 上，求 $\triangle AQP$ 的面积；
+                \part[6] 设 $t\!=\!8$，是否存在以 $FP$、$FQ$为邻边的矩形 $FPEQ$，使得点 $E$ 在 $\Gamma$ 上？\mbox{若存在}，求点 $P$ 的坐标；若不存在，说明理由.
+            \end{parts}
+            \begin{solutionordottedlines}[2cm]
+                \begin{small}
+                    \begin{enumerate*}[(1),nosep,topsep=0pt]
+                        \item $\abs{BF}=t+2$；%点 $B$ 到点 $F$ 的距离
+                        \item $S_{\triangle AQP}=\frac76\sqrt3$；%$\triangle AQP$ 的面积 
+                        \item 存在，$P\left(\frac25,\frac45\sqrt5\right)$.
+                    \end{enumerate*}
+                \end{small}
+            \end{solutionordottedlines}
+            \question \solvingtitle{}
+            \questionvbox{
+                给定无穷数列 $\{a_n\}$，若无穷数列 $\{b_n\}$ 满足：对任意 $n\in\mathbf{N}^*$，都有 $\abs{b_n-a_n}\leq 1$ ，则称 $\{b_n\}$ 与 $\{a_n\}$“接近”.
+            }
+            \begin{parts}
+                \part[4] 设 $\{a_n\}$ 是首项为 $1$，公比为 $\frac12$ 的等比数列，$b_n=a_{n+1}+1\enspace,n\in\mathbf{N}^*$，判断数列 $\{b_n\}$ 是否与 $\{a_n\}$ 接近，并说明理由；
+                \part[6] 设数列 $\{a_n\}$ 的前四项为：$a_1=1$，$a_2=2$，$a_3=4$，$a_4=8$，$\{b_n\}$ 是一个与 $\{a_n\}$ 接近的数列，记集合 $M=\{x|x=b_i,i=1,2,3,4\}$，求 $M$ 中元素的个数 $m$；
+                \part[8] $\{a_n\}$ 是公差为 $d$ 的等差数列. 若存在数列 $\{b_n\}$ 满足：$\{b_n\}$ 与 $\{a_n\}$ 接近，且在 $b_2-b_1,b_3-b_2,\cdots,b_{201}-b_{200}$ 中至少有 $100$ 个为正数，求 $d$ 的取值范围.
+            \end{parts}
+            \begin{solutionordottedlines}[2cm]
+                \begin{small}
+                    \begin{enumerate*}[(1),nosep,topsep=0pt]
+                        \item 接近；
+                        \item $m=3\text{\ 或\ } 4$；
+                        \item $d\in(-2,+\infty)$.
+                    \end{enumerate*}
+                \end{small}
+            \end{solutionordottedlines}
+        \endgradingrange{solving}
+    \end{questions}
+\end{document}

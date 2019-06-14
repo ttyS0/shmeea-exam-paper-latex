@@ -1,0 +1,28 @@
+\GetIdInfo$Id: ctex.dtx 735dfe2 2019-06-12 20:42:29 +0800 Shichu Yang <yscysc01@hotmail.com> $
+  {SinoType fonts definition for SHMEEA test papers}
+\ProvidesExplFile{ctex-fontset-shmeea.def}
+  {\ExplFileDate}{2.4.16}{\ExplFileDescription}
+\sys_if_engine_pdftex:TF
+  { \ctex_fontset_error:n { shmeea } }
+  {
+    \sys_if_engine_uptex:TF
+      { \ctex_fontset_error:n { shmeea } }
+      {
+        \setCJKmainfont [ BoldFont = STHeiti , ItalicFont = STKaiti ] { STZhongsong }
+        \setCJKsansfont [ BoldFont = STHeiti ] { STXihei }
+        \setCJKmonofont { STFangsong }
+        \setCJKfamilyfont { simsun } { SimSun }
+        \setCJKfamilyfont { zhsong } { STZhongsong }
+        \setCJKfamilyfont { zhhei }  { STHeiti }
+        \setCJKfamilyfont { zhfs }   { STFangsong }
+\setCJKfamilyfont { zhkai }  { STKaiti }
+      }
+  }
+\NewDocumentCommand \windowsong   { } { \CJKfamily { simsun } }
+\NewDocumentCommand \songti   { } { \CJKfamily { zhsong } }
+\NewDocumentCommand \heiti    { } { \CJKfamily { zhhei } }
+\NewDocumentCommand \fangsong { } { \CJKfamily { zhfs } }
+\NewDocumentCommand \kaishu   { } { \CJKfamily { zhkai } }
+%% 
+%%
+%% End of file `ctex-fontset-shmeea.def'.
